@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Login to earn xp
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+
+  DailyEarnXpSocioGigante:
+    Type: AWS::Serverless::Function
+    Description: Invoked by EventBridge scheduled rule
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: nodejs16.x
+      Timeout: 360
+      MemorySize: 1536
+      Layers:
+        - !Sub 'arn:aws:lambda:${AWS::Region}:764866452798:layer:chrome-aws-lambda:31'
+      Environment:
+        Variables:
+          SITE_USER: ''
+          SITE_PASS: ''
+          SITE_URL: ''
+
+      Events:
+        DailyEarnXpSocioGiganteEvent:
+          Type: Schedule
+          Properties:
+            Schedule: cron(15 15 * * ? *)
+
+Outputs:
+  ConsumerFunction:
+    Description: DailyEarnXpSocioGigante function name
+    Value: !Ref DailyEarnXpSocioGigante
